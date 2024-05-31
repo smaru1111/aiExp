@@ -5,8 +5,10 @@
 #define SEED               39 // 乱数の種
 #define TRAINING_NUMBER    5 // 訓練データの数
 #define TEST_NUMBER      100 // テストデータの数
+#define DATA_INDEX       100 // テストデータの個数
 #define INPUT_NUMBER      15 // 入力層のニューロン数
-#define HIDDEN_NUMBER     5 // 隠れ層のニューロン数
+#define HIDDEN_NUMBER     12 // 隠れ層のニューロン数
+
 #define OUTPUT_NUMBER      5 // 出力層のニューロン数
 #define LEARNING_RATE   0.01 // 学習率
 #define LEARNING_TIME   1000 // 学習回数
@@ -28,7 +30,7 @@ double training_output[TRAINING_NUMBER][OUTPUT_NUMBER] = { // 訓練データの教師信
 	{ 0, 0, 0, 0, 1 }
 };
 
-double test_input[TEST_NUMBER][INPUT_NUMBER];              // テストデータ
+double test_input[TEST_NUMBER][INPUT_NUMBER][DATA_INDEX];              // テストデータ
 double training_input[TRAINING_NUMBER][INPUT_NUMBER] = {   // 学習データ
 	{ 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1 },
 	{ 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0 },
@@ -56,23 +58,25 @@ int main()
 
 void make_test(void)
 {
-	int t, i, o, tn;
+	int t, i, test_index, o, tn;
 
-	for (t = 0; t < TEST_NUMBER; t++){
-
-		tn = (int)(((double)rand() / (1.0 + RAND_MAX)) * OUTPUT_NUMBER);
-		
-		for (i = 0; i < INPUT_NUMBER; i++){
-			if (((double)rand() / ((double)RAND_MAX + 1)) < 0.1){
-				test_input[t][i] = 1 - training_input[tn][i];
+	for (test_index = 0; test_index < DATA_INDEX; test_index++)
+	{
+		for (t = 0; t < TEST_NUMBER; t++){
+			tn = (int)(((double)rand() / (1.0 + RAND_MAX)) * OUTPUT_NUMBER);
+			
+			for (i = 0; i < INPUT_NUMBER; i++){
+				if (((double)rand() / ((double)RAND_MAX + 1)) < 0.1){
+					test_input[t][i][test_index] = 1 - training_input[tn][i];
+				}
+				else{
+					test_input[t][i][test_index] = training_input[tn][i];
+				}
 			}
-			else{
-				test_input[t][i] = training_input[tn][i];
-			}
-		}
 
-		for (o = 0; o < OUTPUT_NUMBER; o++){
-			test_output[t][o] = training_output[tn][o];
+			for (o = 0; o < OUTPUT_NUMBER; o++){
+				test_output[t][o] = training_output[tn][o];
+			}
 		}
 	}
 }
@@ -155,7 +159,7 @@ void learn(void){
 		}
 		test_error = get_test_error();
 		// printf("%5.5f    %5.5f\n",error,test_error);
-		printf("%d, %5.5f\n", l, error);
+		printf("%d, %5.5f\n", l, test_error);
 
 		// input_weight による E の微分値の計算
 		for (h = 0; h < HIDDEN_NUMBER; h++){
@@ -205,37 +209,48 @@ double get_test_error(void){
 	double wix, whs;
 	double o_whs[TEST_NUMBER][OUTPUT_NUMBER];
 	double sigmoid_wix[TEST_NUMBER][HIDDEN_NUMBER];
+	double test_error_ldata[DATA_INDEX];
 
-	// 中間細胞の出力 sigmoid_wix の計算
-	for (int t = 0; t < TEST_NUMBER; t++){
-		for (int h = 0; h < HIDDEN_NUMBER; h++){
-			wix = 0;
-			for (int i = 0; i < INPUT_NUMBER; i++){
-				wix += input_weight[h][i] * test_input[t][i];
-			}
-			sigmoid_wix[t][h] = 1 / (1 + exp(-wix));
-		}
-	}
-
-	// 出力細胞の出力 whs の計算
-	// 教師信号 - 出力細胞 o_whs の計算
-	for (int t = 0; t < TEST_NUMBER; t++){
-		for (int o = 0; o < OUTPUT_NUMBER; o++){
-			whs = 0;
+	for (int test_index = 0; test_index < DATA_INDEX; test_index++){
+		// 中間細胞の出力 sigmoid_wix の計算
+		for (int t = 0; t < TEST_NUMBER; t++){
 			for (int h = 0; h < HIDDEN_NUMBER; h++){
-				whs += hidden_weight[o][h] * sigmoid_wix[t][h];
+				wix = 0;
+				for (int i = 0; i < INPUT_NUMBER; i++){
+					wix += input_weight[h][i] * test_input[t][i][test_index];
+				}
+				sigmoid_wix[t][h] = 1 / (1 + exp(-wix));
 			}
-			o_whs[t][o] = test_output[t][o] - whs;
 		}
-	}
 
-	// テストデータの２乗誤差の計算
+		// 出力細胞の出力 whs の計算
+		// 教師信号 - 出力細胞 o_whs の計算
+		for (int t = 0; t < TEST_NUMBER; t++){
+			for (int o = 0; o < OUTPUT_NUMBER; o++){
+				whs = 0;
+				for (int h = 0; h < HIDDEN_NUMBER; h++){
+					whs += hidden_weight[o][h] * sigmoid_wix[t][h];
+				}
+				o_whs[t][o] = test_output[t][o] - whs;
+			}
+		}
+
+		// テストデータの２乗誤差の計算
+		test_error = 0;
+		for (int t = 0; t < TEST_NUMBER; t++){
+			for (int o = 0; o < OUTPUT_NUMBER; o++){
+				test_error += pow(o_whs[t][o], 2);
+			}
+		}
+		
+		test_error_ldata[test_index] = test_error;
+	}
+	// test_error_ldataの平均を求める
 	test_error = 0;
-	for (int t = 0; t < TEST_NUMBER; t++){
-		for (int o = 0; o < OUTPUT_NUMBER; o++){
-			test_error += pow(o_whs[t][o], 2);
-		}
+	for (int test_index = 0; test_index < DATA_INDEX; test_index++){
+		test_error += test_error_ldata[test_index];
 	}
-
-	return test_error / TEST_NUMBER;
+	test_error /= DATA_INDEX;
+	
+	return test_error;
 }
