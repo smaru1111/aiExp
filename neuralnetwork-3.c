@@ -9,9 +9,9 @@
 
 #define OUTPUT_NUMBER      10 // 出力層のニューロン数
 
-#define HIDDEN_NUMBER     3 // 隠れ層のニューロン数
-#define LEARNING_RATE   0.1 // 学習率
-#define LEARNING_TIME   500 // 学習回数
+#define HIDDEN_NUMBER     5 // 隠れ層のニューロン数
+#define LEARNING_RATE   0.01 // 学習率
+#define LEARNING_TIME   1000 // 学習回数
 
 void make_test(void);
 void init_weight(void);
@@ -65,12 +65,12 @@ int main()
     }
 
     // 各学習ステップの平均二乗誤差を表示
-    for (int l = 0; l < LEARNING_TIME; l++) {
-        average_test_errors[l] /= 100;
-        printf("%d, %5.5f\n", l, average_test_errors[l]);
-    }
-		// average_test_errors[999] /= 100;
-		// printf("%5.5f\n",  average_test_errors[999]);
+    // for (int l = 0; l < LEARNING_TIME; l++) {
+    //     average_test_errors[l] /= 100;
+    //     printf("%d, %5.5f\n", l, average_test_errors[l]);
+    // }
+		average_test_errors[999] /= 100;
+		printf("%5.5f\n",  average_test_errors[999]);
 
     return 0;
 }

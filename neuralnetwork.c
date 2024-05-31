@@ -155,7 +155,7 @@ void learn(void){
 		}
 		test_error = get_test_error();
 		// printf("%5.5f    %5.5f\n",error,test_error);
-		printf("%d, %5.5f\n", l, error);
+		printf("%d, %5.5f\n", l, test_error);
 
 		// input_weight ‚É‚æ‚é E ‚Ì”÷•ª’l‚ÌŒvŽZ
 		for (h = 0; h < HIDDEN_NUMBER; h++){
