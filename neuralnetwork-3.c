@@ -2,27 +2,27 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define SEED               39 // —”‚Ìí
-#define TRAINING_NUMBER    10 // ŒP—ûƒf[ƒ^‚Ì”
-#define TEST_NUMBER      100 // ƒeƒXƒgƒf[ƒ^‚Ì”
-#define INPUT_NUMBER      15 // “ü—Í‘w‚Ìƒjƒ…[ƒƒ“”
+#define SEED               39 // ï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½
+#define TRAINING_NUMBER    10 // ï¿½Pï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Ìï¿½
+#define TEST_NUMBER      100 // ï¿½eï¿½Xï¿½gï¿½fï¿½[ï¿½^ï¿½Ìï¿½
+#define INPUT_NUMBER      15 // ï¿½ï¿½ï¿½Í‘wï¿½Ìƒjï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-#define OUTPUT_NUMBER      10 // o—Í‘w‚Ìƒjƒ…[ƒƒ“”
+#define OUTPUT_NUMBER      10 // ï¿½oï¿½Í‘wï¿½Ìƒjï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-#define HIDDEN_NUMBER     5 // ‰B‚ê‘w‚Ìƒjƒ…[ƒƒ“”
-#define LEARNING_RATE   0.01 // ŠwK—¦
-#define LEARNING_TIME   1000 // ŠwK‰ñ”
+#define HIDDEN_NUMBER     10 // ï¿½Bï¿½ï¿½wï¿½Ìƒjï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define LEARNING_RATE   0.01 // ï¿½wï¿½Kï¿½ï¿½
+#define LEARNING_TIME   1000 // ï¿½wï¿½Kï¿½ï¿½
 
 void make_test(void);
 void init_weight(void);
 void learn(void);
 double get_test_error(void);
 
-double input_weight[HIDDEN_NUMBER][INPUT_NUMBER];          // “ü—Í‘w‚©‚ç‰B‚ê‘w‚Ö‚Ìd‚İ
-double hidden_weight[OUTPUT_NUMBER][HIDDEN_NUMBER];        // ‰B‚ê‘w‚©‚ço—Í‘w‚Ö‚Ìd‚İ
+double input_weight[HIDDEN_NUMBER][INPUT_NUMBER];          // ï¿½ï¿½ï¿½Í‘wï¿½ï¿½ï¿½ï¿½Bï¿½ï¿½wï¿½Ö‚Ìdï¿½ï¿½
+double hidden_weight[OUTPUT_NUMBER][HIDDEN_NUMBER];        // ï¿½Bï¿½ï¿½wï¿½ï¿½ï¿½ï¿½oï¿½Í‘wï¿½Ö‚Ìdï¿½ï¿½
 
-double test_output[TEST_NUMBER][OUTPUT_NUMBER];            // ƒeƒXƒgƒf[ƒ^‚Ì‹³tM†
-double training_output[TRAINING_NUMBER][OUTPUT_NUMBER] = {     // ŒP—ûƒf[ƒ^‚Ì‹³tM†
+double test_output[TEST_NUMBER][OUTPUT_NUMBER];            // ï¿½eï¿½Xï¿½gï¿½fï¿½[ï¿½^ï¿½Ì‹ï¿½ï¿½tï¿½Mï¿½ï¿½
+double training_output[TRAINING_NUMBER][OUTPUT_NUMBER] = {     // ï¿½Pï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Ì‹ï¿½ï¿½tï¿½Mï¿½ï¿½
     { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
@@ -35,8 +35,8 @@ double training_output[TRAINING_NUMBER][OUTPUT_NUMBER] = {     // ŒP—ûƒf[ƒ^‚Ì‹³
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }
 };
 
-double test_input[TEST_NUMBER][INPUT_NUMBER];									 // ƒeƒXƒgƒf[ƒ^
-double training_input[TRAINING_NUMBER][INPUT_NUMBER] = {       // ŠwKƒf[ƒ^
+double test_input[TEST_NUMBER][INPUT_NUMBER];									 // ï¿½eï¿½Xï¿½gï¿½fï¿½[ï¿½^
+double training_input[TRAINING_NUMBER][INPUT_NUMBER] = {       // ï¿½wï¿½Kï¿½fï¿½[ï¿½^
     { 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 },
     { 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1 },
     { 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1 },
@@ -51,8 +51,8 @@ double training_input[TRAINING_NUMBER][INPUT_NUMBER] = {       // ŠwKƒf[ƒ^
 
 double total_test_error = 0;
 double total_error = 0;
-double average_test_errors[LEARNING_TIME]; // ŠeŠwKƒXƒeƒbƒv‚Ì—İÏŒë·
-double average_errors[LEARNING_TIME]; // ŠeŠwKƒXƒeƒbƒv‚Ì—İÏŒë·
+double average_test_errors[LEARNING_TIME]; // ï¿½eï¿½wï¿½Kï¿½Xï¿½eï¿½bï¿½vï¿½Ì—İÏŒë·
+double average_errors[LEARNING_TIME]; // ï¿½eï¿½wï¿½Kï¿½Xï¿½eï¿½bï¿½vï¿½Ì—İÏŒë·
 
 int main()
 {
@@ -64,21 +64,21 @@ int main()
         learn();
     }
 
-    // ŠeŠwKƒXƒeƒbƒv‚Ì•½‹Ï“ñæŒë·‚ğ•\¦
-    // for (int l = 0; l < LEARNING_TIME; l++) {
-    //     average_test_errors[l] /= 100;
-    //     printf("%d, %5.5f\n", l, average_test_errors[l]);
-    // }
-		average_test_errors[999] /= 100;
-		printf("%5.5f\n",  average_test_errors[999]);
+    // ï¿½eï¿½wï¿½Kï¿½Xï¿½eï¿½bï¿½vï¿½Ì•ï¿½ï¿½Ï“ï¿½ï¿½ë·ï¿½ï¿½\ï¿½ï¿½
+    for (int l = 0; l < LEARNING_TIME; l++) {
+        average_test_errors[l] /= 100;
+        printf("%d, %5.5f\n", l, average_test_errors[l]);
+    }
+		// average_test_errors[LEARNING_TIME-1] /= 100;
+		// printf("%5.5f\n",  average_test_errors[LEARNING_TIME-1]);
 
     return 0;
 }
 
 /* =================================== */
-/* ƒeƒXƒgƒf[ƒ^‚Æ‹³tM†‚Ìì¬        */
-/* ŠwKƒf[ƒ^‚ğ10“‚ÌŠm—¦‚Å0,1”½“]‚·‚é */
-/* ‚±‚Æ‚É‚æ‚èƒeƒXƒgƒf[ƒ^‚ğì¬‚·‚éD  */
+/* ï¿½eï¿½Xï¿½gï¿½fï¿½[ï¿½^ï¿½Æ‹ï¿½ï¿½tï¿½Mï¿½ï¿½ï¿½Ìì¬        */
+/* ï¿½wï¿½Kï¿½fï¿½[ï¿½^ï¿½ï¿½10ï¿½ï¿½ï¿½ÌŠmï¿½ï¿½ï¿½ï¿½0,1ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ */
+/* ï¿½ï¿½ï¿½Æ‚É‚ï¿½ï¿½eï¿½Xï¿½gï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ì¬ï¿½ï¿½ï¿½ï¿½D  */
 /* =================================== */
 
 void make_test(void)
@@ -105,23 +105,23 @@ void make_test(void)
 }
 
 /* ================================= */
-/* d‚İ‚Ì‰Šú‰»                      */
-/* input_weight‚Æhidden_weight‚ğ‘S‚Ä */
-/* -0.1`0.1 ‚Ìˆê—l—”‚Å‰Šú‰»‚·‚éD*/
+/* ï¿½dï¿½İ‚Ìï¿½ï¿½ï¿½ï¿½ï¿½                      */
+/* input_weightï¿½ï¿½hidden_weightï¿½ï¿½Sï¿½ï¿½ */
+/* -0.1ï¿½`0.1 ï¿½Ìˆï¿½lï¿½ï¿½ï¿½ï¿½ï¿½Åï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½D*/
 /* ================================= */
 
 void init_weight(void){
 
     int h, i, o;
 
-    // input_weight‚Ì‰Šú‰»
+    // input_weightï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
     for (h = 0; h < HIDDEN_NUMBER; h++){
         for (i = 0; i < INPUT_NUMBER; i++){
             input_weight[h][i] = ((double)rand() / ((double)RAND_MAX + 1)) * 0.2 - 0.1;
         }
     }
 
-    // hidden_weight‚Ì‰Šú‰»
+    // hidden_weightï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
     for (o = 0; o < OUTPUT_NUMBER; o++){
         for (h = 0; h < HIDDEN_NUMBER; h++){
             hidden_weight[o][h] = ((double)rand() / ((double)RAND_MAX + 1)) * 0.2 - 0.1;
@@ -130,7 +130,7 @@ void init_weight(void){
 }
 
 /* ============== */
-/* d‚İ‚ğŠwK‚·‚é */
+/* ï¿½dï¿½İ‚ï¿½ï¿½wï¿½Kï¿½ï¿½ï¿½ï¿½ */
 /* ============== */
 
 void learn(void){
@@ -147,8 +147,8 @@ void learn(void){
 
     for (l = 0; l < LEARNING_TIME; l++){
 
-        // ’†ŠÔ×–E‚Ìo—Í sigmoid_wix ‚ÌŒvZ
-        // sigmoidŠÖ”‚Ì‘ã‚í‚è‚ÉusigmoidŠÖ”‚ğ”÷•ª‚µ‚½ŠÖ”v‚ğg—p‚µ‚½Û‚Ì’†ŠÔ×–E‚Ìo—Í delta_sigmoid_wix ‚ÌŒvZ
+        // ï¿½ï¿½ï¿½Ô×–Eï¿½Ìoï¿½ï¿½ sigmoid_wix ï¿½ÌŒvï¿½Z
+        // sigmoidï¿½Öï¿½ï¿½Ì‘ï¿½ï¿½ï¿½Éusigmoidï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½ï¿½vï¿½ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½ï¿½ï¿½Û‚Ì’ï¿½ï¿½Ô×–Eï¿½Ìoï¿½ï¿½ delta_sigmoid_wix ï¿½ÌŒvï¿½Z
         for (t = 0; t < TRAINING_NUMBER; t++){
             for (h = 0; h < HIDDEN_NUMBER; h++){
                 wix = 0;
@@ -160,8 +160,8 @@ void learn(void){
             }
         }
 
-        // o—Í×–E‚Ìo—Í whs ‚ÌŒvZ
-        // ‹³tM† - o—Í×–E o_whs ‚ÌŒvZ
+        // ï¿½oï¿½Í×–Eï¿½Ìoï¿½ï¿½ whs ï¿½ÌŒvï¿½Z
+        // ï¿½ï¿½ï¿½tï¿½Mï¿½ï¿½ - ï¿½oï¿½Í×–E o_whs ï¿½ÌŒvï¿½Z
         for (t = 0; t < TRAINING_NUMBER; t++){
             for (o = 0; o < OUTPUT_NUMBER; o++){
                 whs = 0;
@@ -172,8 +172,8 @@ void learn(void){
             }
         }
 
-        // ŒP—ûƒf[ƒ^‚Ì‚QæŒë· error ‚ÌŒvZE•\¦
-        // ƒeƒXƒgƒf[ƒ^‚Ì‚QæŒë· test_error ‚ÌŒvZE•\¦
+        // ï¿½Pï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Ì‚Qï¿½ï¿½ë· error ï¿½ÌŒvï¿½Zï¿½Eï¿½\ï¿½ï¿½
+        // ï¿½eï¿½Xï¿½gï¿½fï¿½[ï¿½^ï¿½Ì‚Qï¿½ï¿½ë· test_error ï¿½ÌŒvï¿½Zï¿½Eï¿½\ï¿½ï¿½
         error = 0;
         for (t = 0; t < TRAINING_NUMBER; t++){
             for (o = 0; o < OUTPUT_NUMBER; o++){
@@ -182,12 +182,12 @@ void learn(void){
         }
         test_error = get_test_error();
         
-        // ŠeŠwKƒXƒeƒbƒv–ˆ‚Ì—İÏŒë·‚ÌXV
+        // ï¿½eï¿½wï¿½Kï¿½Xï¿½eï¿½bï¿½vï¿½ï¿½ï¿½Ì—İÏŒë·ï¿½ÌXï¿½V
         average_test_errors[l] += test_error;
 
         // printf("%d, %5.5f\n", l, test_error);
 
-        // input_weight ‚É‚æ‚é E ‚Ì”÷•ª’l‚ÌŒvZ
+        // input_weight ï¿½É‚ï¿½ï¿½ E ï¿½Ì”ï¿½ï¿½ï¿½ï¿½lï¿½ÌŒvï¿½Z
         for (h = 0; h < HIDDEN_NUMBER; h++){
             for (i = 0; i < INPUT_NUMBER; i++){
                 delta_input_weight[h][i] = 0;
@@ -199,7 +199,7 @@ void learn(void){
             }
         }
 
-        // hidden_weight ‚É‚æ‚é E ‚Ì”÷•ª’l‚ÌŒvZ
+        // hidden_weight ï¿½É‚ï¿½ï¿½ E ï¿½Ì”ï¿½ï¿½ï¿½ï¿½lï¿½ÌŒvï¿½Z
         for (o = 0; o < OUTPUT_NUMBER; o++){
             for (h = 0; h < HIDDEN_NUMBER; h++){
                 delta_hidden_weight[o][h] = 0;
@@ -209,14 +209,14 @@ void learn(void){
             }
         }
 
-        // input_weight ‚ÌXV
+        // input_weight ï¿½ÌXï¿½V
         for (h = 0; h < HIDDEN_NUMBER; h++){
             for (i = 0; i < INPUT_NUMBER; i++){
                 input_weight[h][i] -= LEARNING_RATE * delta_input_weight[h][i];
             }
         }
 
-        // hidden_weight ‚ÌXV
+        // hidden_weight ï¿½ÌXï¿½V
         for (o = 0; o < OUTPUT_NUMBER; o++){
             for (h = 0; h < HIDDEN_NUMBER; h++){
                 hidden_weight[o][h] -= LEARNING_RATE * delta_hidden_weight[o][h];
@@ -226,7 +226,7 @@ void learn(void){
 }
 
 /* ============================ */
-/* ƒeƒXƒgƒf[ƒ^‚Ì‚QæŒë·‚ÌŠl“¾ */
+/* ï¿½eï¿½Xï¿½gï¿½fï¿½[ï¿½^ï¿½Ì‚Qï¿½ï¿½ë·ï¿½ÌŠlï¿½ï¿½ */
 /* ============================ */
 
 double get_test_error(void){
@@ -236,7 +236,7 @@ double get_test_error(void){
     double o_whs[TEST_NUMBER][OUTPUT_NUMBER];
     double sigmoid_wix[TEST_NUMBER][HIDDEN_NUMBER];
 
-    // ’†ŠÔ×–E‚Ìo—Í sigmoid_wix ‚ÌŒvZ
+    // ï¿½ï¿½ï¿½Ô×–Eï¿½Ìoï¿½ï¿½ sigmoid_wix ï¿½ÌŒvï¿½Z
     for (int t = 0; t < TEST_NUMBER; t++){
         for (int h = 0; h < HIDDEN_NUMBER; h++){
             wix = 0;
@@ -247,8 +247,8 @@ double get_test_error(void){
         }
     }
 
-    // o—Í×–E‚Ìo—Í whs ‚ÌŒvZ
-    // ‹³tM† - o—Í×–E o_whs ‚ÌŒvZ
+    // ï¿½oï¿½Í×–Eï¿½Ìoï¿½ï¿½ whs ï¿½ÌŒvï¿½Z
+    // ï¿½ï¿½ï¿½tï¿½Mï¿½ï¿½ - ï¿½oï¿½Í×–E o_whs ï¿½ÌŒvï¿½Z
     for (int t = 0; t < TEST_NUMBER; t++){
         for (int o = 0; o < OUTPUT_NUMBER; o++){
             whs = 0;
@@ -259,7 +259,7 @@ double get_test_error(void){
         }
     }
 
-    // ƒeƒXƒgƒf[ƒ^‚Ì‚QæŒë·‚ÌŒvZ
+    // ï¿½eï¿½Xï¿½gï¿½fï¿½[ï¿½^ï¿½Ì‚Qï¿½ï¿½ë·ï¿½ÌŒvï¿½Z
     test_error = 0;
     for (int t = 0; t < TEST_NUMBER; t++){
         for (int o = 0; o < OUTPUT_NUMBER; o++){
