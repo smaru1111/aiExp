@@ -86,11 +86,11 @@ int main() {
     int best_learning_time = 0;
     double min_average_error = 1e9;
 
-    for (int hidden_number = 5; hidden_number <= 21; hidden_number += 3) {
+    for (int hidden_number = 38; hidden_number <= 39; hidden_number += 3) {
         printf("------------------------------------\n");
         printf("Hidden number: %d\n", hidden_number);
-        for (double learning_rate = 0.01; learning_rate <= 0.12; learning_rate += 0.05) {
-            for (int learning_time = 1000; learning_time <= 2000; learning_time += 500) {
+        for (double learning_rate = 0.02; learning_rate <= 0.022; learning_rate += 0.001) {
+            for (int learning_time = 710; learning_time <= 740; learning_time += 10) {
 
                 HIDDEN_NUMBER = hidden_number;
                 LEARNING_RATE = learning_rate;

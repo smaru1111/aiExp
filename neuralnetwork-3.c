@@ -9,9 +9,12 @@
 
 #define OUTPUT_NUMBER      10 // �o�͑w�̃j���[������
 
-#define HIDDEN_NUMBER     10 // �B��w�̃j���[������
-#define LEARNING_RATE   0.01 // �w�K��
-#define LEARNING_TIME   1000 // �w�K��
+#define HIDDEN_NUMBER     38
+#define LEARNING_RATE   0.02
+#define LEARNING_TIME   700
+// #define HIDDEN_NUMBER     32
+// #define LEARNING_RATE   0.01
+// #define LEARNING_TIME   600
 
 void make_test(void);
 void init_weight(void);
@@ -65,12 +68,12 @@ int main()
     }
 
     // �e�w�K�X�e�b�v�̕��ϓ��덷��\��
-    for (int l = 0; l < LEARNING_TIME; l++) {
-        average_test_errors[l] /= 100;
-        printf("%d, %5.5f\n", l, average_test_errors[l]);
-    }
-		// average_test_errors[LEARNING_TIME-1] /= 100;
-		// printf("%5.5f\n",  average_test_errors[LEARNING_TIME-1]);
+    // for (int l = 0; l < LEARNING_TIME; l++) {
+    //     average_test_errors[l] /= 100;
+    //     printf("%d, %5.5f\n", l, average_test_errors[l]);
+    // }
+    average_test_errors[LEARNING_TIME-1] /= 100;
+    printf("%5.5f\n",  average_test_errors[LEARNING_TIME-1]);
 
     return 0;
 }
