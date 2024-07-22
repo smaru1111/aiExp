@@ -2,17 +2,16 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define SEED               0 // ????
-#define LEARNING_RATE   0.01 // ???
-#define DISCOUNT_RATE    0.9 // ???
-#define LEARN_TIME      1000 // ??????
-#define ENEMY_STRATEGY    16 // ????(?????? ENEMY_STRATEGY ???????)
-#define REWARD_WIN       100 // ????????
-#define REWARD_DRAW        0 // ??????????
-#define REWARD_LOSE     -100 // ????????
+#define SEED               0 // 乱数の種
+#define DISCOUNT_RATE    0.9 // 割引率
+#define LEARN_TIME      1000 // 最大更新回数
+#define ENEMY_STRATEGY    16 // 敵の戦略(カード合計が ENEMY_STRATEGY 以下ならヒット)
+#define REWARD_WIN       100 // 報酬（勝った時）
+#define REWARD_DRAW        0 // 報酬（引き分けた時）
+#define REWARD_LOSE     -100 // 報酬（負けた時）
 
-#define STATE_NUMBER      22 // ?????1?21?????(22)
-#define ACTION_NUMBER      2 // ???????
+#define STATE_NUMBER      22 // カード合計1～21とバースト(22)
+#define ACTION_NUMBER      2 // ヒットとステイ
 
 #define HIT                0
 #define STAY               1
@@ -23,11 +22,11 @@
 #define COM_LOSE           3
 
 double q[STATE_NUMBER][ACTION_NUMBER];
-double reward_table[4] = { 0, REWARD_WIN, REWARD_DRAW, REWARD_LOSE }; // ?????????????
+double reward_table[4] = { 0, REWARD_WIN, REWARD_DRAW, REWARD_LOSE }; // 勝負中，勝ち，引分け，負け
 
 void init_q(void);
 void init_card(int *,int *);
-void learn(void);
+void learn(double learning_rate, const char* filename);
 void print_q(void);
 int get_card(void);
 int get_com_action(int);
@@ -36,12 +35,19 @@ int get_enemy_total(int, int);
 int judge(int, int, int);
 int minimum(int, int);
 double maximum(double, double);
-void output_csv(int[], double[]);
+void output_csv(int[], double[], const char*);
 
 int main() {
     srand(SEED);
-    init_q();
-    learn();
+
+    double learning_rates[] = { 10, 1, 0.1, 0.01, 0.001 };
+    const char* filenames[] = { "win_rate_10.csv", "win_rate_0.csv", "win_rate_10-1.csv", "win_rate_10-2.csv", "win_rate_10-3.csv" };
+
+    for (int i = 0; i < 5; i++) {
+        init_q();
+        learn(learning_rates[i], filenames[i]);
+    }
+
     return 0;
 }
 
@@ -53,7 +59,7 @@ void init_q(void) {
     }
 }
 
-void learn(void) {
+void learn(double learning_rate, const char* filename) {
     int com_state, com_action;
     int next_com_state;
     int enemy_total;
@@ -81,7 +87,6 @@ void learn(void) {
         if (result == COM_DRAW) { draw_num++; }
         if (result == COM_LOSE) { lose_num++; }
         if (win_num + draw_num + lose_num != 0) {
-            printf("%f\n", (double)win_num / (win_num + draw_num + lose_num) * 100);
             win_rate[t] = (double)win_num / (win_num + draw_num + lose_num) * 100;
         } else {
             win_rate[t] = 0.0;
@@ -90,7 +95,7 @@ void learn(void) {
         update_count[t] = t + 1;
 
         max_q = maximum(q[next_com_state - 1][HIT], q[next_com_state - 1][STAY]);
-        q[com_state - 1][com_action] += LEARNING_RATE * (reward + DISCOUNT_RATE * max_q - q[com_state - 1][com_action]);
+        q[com_state - 1][com_action] += learning_rate * (reward + DISCOUNT_RATE * max_q - q[com_state - 1][com_action]);
 
         com_state = next_com_state;
         if (result != BATTLE) {
@@ -99,7 +104,7 @@ void learn(void) {
     }
 
     print_q();
-    output_csv(update_count, win_rate);
+    output_csv(update_count, win_rate, filename);
 }
 
 void init_card(int *com_state, int *enemy_total) {
@@ -158,8 +163,8 @@ void print_q(void) {
     }
 }
 
-void output_csv(int update_count[], double win_rate[]) {
-    FILE *fp = fopen("win_rate.csv", "w");
+void output_csv(int update_count[], double win_rate[], const char* filename) {
+    FILE *fp = fopen(filename, "w");
     if (fp == NULL) {
         printf("Failed to open file for writing.\n");
         return;
